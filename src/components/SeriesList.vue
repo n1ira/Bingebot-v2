@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <input v-model="newSeriesName" type="text" placeholder="New series name">
     <button @click="addSeries">Add Series</button>
     <ul>
@@ -12,7 +12,7 @@
       </li>
     </ul>
   </div>
-  <div>
+  <div class="container">
     <button @click="runTracker">Run Tracker</button>
   </div>
 </template>
@@ -67,9 +67,8 @@ export default {
     },
     async runTracker() {
       try {
-        const response = await axios.post('/api/series/run_tracker');
-        console.log("Tracker run successfully.");
-        console.log("Updated seriesList:", response.data);
+        await axios.post('/api/run_tracker');
+        console.log("Tracker started.");
       } catch (error) {
         console.error(error);
       }
