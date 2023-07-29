@@ -8,19 +8,26 @@
       </label>
       <label>
         Torrent Type:
-        <select v-model="settings.torrent_type" multiple>
-          <option value="success">Success</option>
-          <option value="danger">Danger</option>
-          <option value="default">Default</option>
-        </select>
+        <div>
+          <input type="checkbox" v-model="settings.torrent_type.success">
+          <label>Success</label>
+        </div>
+        <div>
+          <input type="checkbox" v-model="settings.torrent_type.danger">
+          <label>Danger</label>
+        </div>
+        <div>
+          <input type="checkbox" v-model="settings.torrent_type.default">
+          <label>Default</label>
+        </div>
       </label>
       <label>
         Poll Interval (seconds):
         <input type="number" v-model="settings.poll_interval_seconds" />
       </label>
       <label>
-        Seek Missing Episodes:
-        <input type="checkbox" v-model="settings.will_seek_missing_episodes" />
+          Seek Missing Episodes:
+          <input type="checkbox" v-model="settings.will_seek_missing_episodes">
       </label>
       <label>
         Seek Missing Episodes Interval (seconds):
@@ -35,12 +42,11 @@
         <input type="number" v-model="settings.seek_newest_episode_interval_seconds" />
       </label>
       <label>
-        Torrent Quality:
-        <input type="text" v-model="settings.torrent_quality" />
-      </label>
-      <label>
         Torrent Providers Whitelist:
-        <input type="text" v-model="settings.torrent_providers_whitelist" />
+        <div v-for="provider in ['nyaa.si', 'otherProvider1', 'otherProvider2']" :key="provider">
+          <input type="checkbox" :value="provider" v-model="settings.torrent_providers_whitelist">
+          <label>{{ provider }}</label>
+        </div>
       </label>
       <label>
         Torrent Client URL:
@@ -66,17 +72,41 @@ export default {
   name: 'AppSettings',
   data() {
     return {
-      settings: {},
-    };
+      settings: {
+        download_dir: "",
+        torrent_type: {
+          success: false,
+          danger: false,
+          default: false,
+        },
+        torrent_quality: {
+          '480': false,
+          '720': false,
+          '1080': false,
+        },
+        torrent_providers_whitelist: []
+        // ... other settings properties ...
+      }
+    }
   },
   async created() {
     const response = await axios.get('/api/settings');
-    this.settings = response.data;
+    const settings = response.data;
+
+    // Do not join the whitelist into a string
+    // settings.torrent_providers_whitelist = settings.torrent_providers_whitelist.join(', ');
+
+    this.settings = settings;
   },
   methods: {
     async saveSettings() {
-      await axios.put('/api/settings/1', this.settings);
+      // If settings.torrent_providers_whitelist is not an array, convert it to array
+      if (typeof this.settings.torrent_providers_whitelist === 'string') {
+          this.settings.torrent_providers_whitelist = this.settings.torrent_providers_whitelist.split(', ');
+      }
+          
+      await axios.put(`/api/settings/1`, this.settings);
     },
   },
-};
+}
 </script>

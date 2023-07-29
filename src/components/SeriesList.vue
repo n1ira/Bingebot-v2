@@ -1,25 +1,29 @@
 <template>
   <div class="container">
-    <input v-model="newSeriesName" type="text" placeholder="New series name">
-    <button @click="addSeries">Add Series</button>
+    <div id="new-anime">
+      <input v-model="newSeriesName" type="text" placeholder="New series name">
+      <button type="button" @click="addSeries">Add Series</button>
+    </div>
     <ul>
       <li v-for="series in seriesList" :key="series.id">
-        {{ series.name }}
-        <button @click="removeSeries(series.id)">Remove</button>
-        <!-- Add update input field and button -->
-        <input v-model.number="series.last_episode_downloaded" type="number" min="0" placeholder="Last episode downloaded">
-        <button @click="updateSeries(series.id, series.last_episode_downloaded)">Update</button>
+        <div class="series-name" contenteditable="true" @blur="editSeriesName($event, series.id)" @keydown.enter.prevent="editSeriesName($event, series.id)">
+          {{ series.name }}
+        </div>
+        <div class="episode-number">
+          <input class="episode-input" v-model.number="series.last_episode_downloaded" type="number" min="0" placeholder="Last episode downloaded" @input="updateEpisodeNumber(series.id, series.last_episode_downloaded)">
+        </div>
+        <div class="remove-button">
+          <button type="button" @click="removeSeries(series.id)">Remove</button>
+        </div>
       </li>
     </ul>
-  </div>
-  <div class="container">
-    <button @click="runTracker">Run Tracker</button>
   </div>
 </template>
 
 
 <script>
 import axios from 'axios';
+import _ from 'lodash';
 
 export default {
   data() {
@@ -54,7 +58,7 @@ export default {
         console.error(error);
       }
     },
-    async updateSeries(id, last_episode_downloaded) {
+    updateEpisodeNumber: _.debounce(async function(id, last_episode_downloaded) {
       try {
         await axios.put(`/api/series/${id}`, { last_episode_downloaded });
         const updatedSeries = this.seriesList.find(series => series.id === id);
@@ -64,11 +68,19 @@ export default {
       } catch (error) {
         console.error(error);
       }
+    }, 500),
+    editSeriesName(event, seriesId) {
+      const newName = event.target.innerText;
+      this.updateSeriesName(seriesId, newName);
     },
-    async runTracker() {
+
+    async updateSeriesName(id, newName) {
       try {
-        await axios.post('/api/run_tracker');
-        console.log("Tracker started.");
+        await axios.put(`/api/series/${id}`, { name: newName });
+        const updatedSeries = this.seriesList.find(series => series.id === id);
+        if (updatedSeries) {
+          updatedSeries.name = newName;
+        }
       } catch (error) {
         console.error(error);
       }
@@ -79,3 +91,40 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+li {
+  list-style-type: none;
+  display: flex;
+  align-items: stretch; /* changed from 'center' to 'stretch' */
+  justify-content: space-between;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+#new-anime {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 10px;
+}
+.series-name {
+  /* make series-name float left and fixed width */
+  float: left;
+  width: 70%; 
+  word-wrap: break-word;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: #ececec;
+}
+
+li > button {
+  width: 90px;
+}
+.episode-input {
+  width: 37px !important;
+}
+</style>

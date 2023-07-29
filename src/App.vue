@@ -1,18 +1,24 @@
 <template>
-  <SeriesList/>
-  <AppSettings/>
+    <div class="app-container">
+        <h1 id="title">BingeBot</h1>
+        <SeriesList/>
+        <TrackerManagement/>
+        <AppSettings/>
+    </div>
 </template>
 
 <script>
 import SeriesList from './components/SeriesList.vue'
+import TrackerManagement from './components/TrackerManagement.vue'
 import AppSettings from './components/AppSettings.vue'
 
 export default {
-  name: 'App',
-  components: {
-    SeriesList,
-    AppSettings
-  }
+    name: 'App',
+    components: {
+        SeriesList,
+        TrackerManagement,
+        AppSettings
+    }
 }
 </script>
 
@@ -37,33 +43,42 @@ h1 {
     margin-bottom: 20px;
 }
 
-form {
-    display: flex;
-    flex-direction: column;
+#title {
+    text-align: center;
 }
 
 label {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+label > div {
     display: flex;
-    flex-direction: column;
-    margin-bottom: 10px;
+    align-items: center;
+    gap: 10px;
+}
+
+form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
 input[type="text"], input[type="number"], input[type="password"], select {
     padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 10px;
     font-size: 1em;
 }
 
 button {
-    padding: 10px 20px;
+    padding: 10px 16px;
     background-color: #007BFF;
     color: #fff;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 1em;
-    margin-top: 20px;
 }
 
 button:hover {
