@@ -95,6 +95,7 @@ li {
     padding: 10px;
     margin-bottom: 10px;
     border-radius: 4px;
+    gap: 1em;
 }
 
 li button {
